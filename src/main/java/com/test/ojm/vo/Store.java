@@ -19,5 +19,5 @@ public class Store {
 //    String storeReviewCount;//            - 리뷰점수 or 리뷰 개수( **reviewCount ) → 셀레니움테스트**
     String storeAddress;    //          - 주소 (address, abbrAddress, 도로명 : roadAddress)
     String storeId;         //  - 가게 아이디값(id)
-    String storeCatetory;   //- 카테고리 (category) ⇒ ex) 한식 : 1, 일식 : 2
+    String storeCategory;   //- 카테고리 (category) ⇒ ex) 한식 : 1, 일식 : 2
 }

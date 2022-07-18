@@ -106,7 +106,7 @@ ex)
 
         System.out.println("maxPage :" + maxPage);
 
-        //while(pageNum<maxPage){
+        while(pageNum<maxPage){
             RestTemplate restTemplate = new RestTemplate();
             String pageParameter = "page="+pageNum+"&";
             String url = urlParameter + queryParameter + typeParameter + searchCoordParameter + pageParameter + displayCountParameter + isPlaceRecommendationReplaceParameter;
@@ -125,26 +125,32 @@ ex)
 
             for(int i=0; i<placeList.size(); i++){
                 Store store = Store.builder()
-                        .storeId(placeList.get(i).getAsJsonObject().get("id").getAsString())
-                        .storeName(placeList.get(i).getAsJsonObject().get("name").getAsString())
-                        .storeCatetory(placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString()
-                                .replace("[","").replace("]","").replaceAll("\"","").trim())
-                        .storeAddress(placeList.get(i).getAsJsonObject().get("roadAddress").getAsString())
-                        .storeTel(placeList.get(i).getAsJsonObject().get("tel").getAsString())
+                        .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : "null")
+                        .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : "null")
+                        .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : "null"))
+                        .storeAddress(!placeList.get(i).getAsJsonObject().get("roadAddress").isJsonNull() ? placeList.get(i).getAsJsonObject().get("roadAddress").getAsString() : "null")
+                        .storeTel(!placeList.get(i).getAsJsonObject().get("tel").isJsonNull() ? placeList.get(i).getAsJsonObject().get("tel").getAsString() : "null")
                         .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : "null")
                         .storeSales(true)
-                        .storeDistance(placeList.get(i).getAsJsonObject().get("distance").getAsString())
+                        .storeDistance(!placeList.get(i).getAsJsonObject().get("distance").isJsonNull() ? placeList.get(i).getAsJsonObject().get("distance").getAsString() : "null")
                         .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : "null")
                         .build();
                 storeList.add(store);
             }
             pageNum++;
-        //}
+        }
         responseInfo.setResponseCode(0);
         responseInfo.setResponseMsg(storeList.size() + "건 성공.");
         responseInfo.setData(storeList);
 
         return responseInfo;
+    }
+
+    private String parseStoreCategory(String s) {
+
+        String returnString = s.equals("null") ? "null" : s.replace("[","").replace("]","").replaceAll("\"","").trim();
+
+        return returnString;
     }
 
     private int checkMaxPage(String url, String queryParameter, String typeParameter, String searchCoordParameter, int pageNum, String displayCountParameter, String isPlaceRecommendationReplaceParameter) {
@@ -175,6 +181,7 @@ ex)
         }
         return returnNum;
     }
+
 
 
     // 37703991
