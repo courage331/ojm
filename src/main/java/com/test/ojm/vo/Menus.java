@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseInfo {
-
-    int responseCode;
-    String responseMsg;
-    Object data;
+public class Menus {
+    String name;
+    String price;
+    boolean isRecommended;
+    boolean change;
 }

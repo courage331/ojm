@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.test.ojm.vo.Location;
+import com.test.ojm.vo.Menus;
 import com.test.ojm.vo.ResponseInfo;
 import com.test.ojm.vo.Store;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,55 +91,121 @@ ex)
             @RequestParam(name="searchCoord") String searchCoord
     ){
         ResponseInfo responseInfo = new ResponseInfo();
+        List<Store> storeList = new ArrayList<>();
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://map.naver.com/v5/api/search?caller=pcweb&";
+
+        String urlParameter = "https://map.naver.com/v5/api/search?caller=pcweb&";
         String queryParameter = "query=음식점&";
         String typeParameter = "type=all&";
         String searchCoordParameter = "searchCoord="+searchCoord+"&"; // searchCoord=127.25040539999999;37.657918499999795&
-        String pageParameter = "page=1&";
+        int pageNum = 1;
         String displayCountParameter = "displayCount=100&";
-        String isPlaceRecommendationReplaceParameter = "isPlaceRecommendationReplace=true&";
+        String isPlaceRecommendationReplaceParameter = "isPlaceRecommendationReplace=true";
 
+        int maxPage = checkMaxPage(urlParameter,queryParameter,typeParameter,searchCoordParameter,pageNum,displayCountParameter,isPlaceRecommendationReplaceParameter);
 
-        url = url + queryParameter + typeParameter + searchCoordParameter + pageParameter + displayCountParameter + isPlaceRecommendationReplaceParameter;
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/json");
+        System.out.println("maxPage :" + maxPage);
 
-        HttpEntity<String> entity = new HttpEntity(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url+"lang=ko", HttpMethod.GET, entity, String.class);
-        //System.out.println(response.getBody());
-        //{"error":{"code":"XE400","msg":"Bad Request.","displayMsg":"잘못된 요청입니다.","extraInfo":null}}
+        while(pageNum<maxPage){
+            RestTemplate restTemplate = new RestTemplate();
+            String pageParameter = "page="+pageNum+"&";
+            String url = urlParameter + queryParameter + typeParameter + searchCoordParameter + pageParameter + displayCountParameter + isPlaceRecommendationReplaceParameter;
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Accept", "application/json");
+            System.out.println("url : " + url);
+            HttpEntity<String> entity = new HttpEntity(headers);
+            ResponseEntity<String> response = restTemplate.exchange(url+"lang=ko", HttpMethod.GET, entity, String.class);
+            //System.out.println(response.getBody());
+            //{"error":{"code":"XE400","msg":"Bad Request.","displayMsg":"잘못된 요청입니다.","extraInfo":null}}
+            JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
+            JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
+            JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"),JsonObject.class);
+            JsonArray placeList = gson.fromJson(place.getAsJsonObject().get("list"), JsonArray.class);
 
-
-        List<Store> storeList = new ArrayList<>();
-
-        JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
-        JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
-        JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"),JsonObject.class);
-        JsonArray placeList = gson.fromJson(place.getAsJsonObject().get("list"), JsonArray.class);
-
-        for(int i=0; i<placeList.size(); i++){
-            Store store = Store.builder()
-                    .storeId(placeList.get(i).getAsJsonObject().get("id").getAsString())
-                    .storeName(placeList.get(i).getAsJsonObject().get("name").getAsString())
-                    .storeCatetory(placeList.get(0).getAsJsonObject().get("category").getAsJsonArray().toString()
-                            .replace("[","").replace("]","").replaceAll("\"","").trim())
-                    .storeAddress(placeList.get(i).getAsJsonObject().get("roadAddress").getAsString())
-                    .storeTel(placeList.get(i).getAsJsonObject().get("tel").getAsString())
-                    .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : "null")
-                    .storeSales(true)
-                    .storeDistance(placeList.get(i).getAsJsonObject().get("distance").getAsString())
-                    .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : "null")
-                    .build();
-            storeList.add(store);
+            for(int i=0; i<placeList.size(); i++){
+                Store store = Store.builder()
+                        .storeId(placeList.get(i).getAsJsonObject().get("id").getAsString())
+                        .storeName(placeList.get(i).getAsJsonObject().get("name").getAsString())
+                        .storeCatetory(placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString()
+                                .replace("[","").replace("]","").replaceAll("\"","").trim())
+                        .storeAddress(placeList.get(i).getAsJsonObject().get("roadAddress").getAsString())
+                        .storeTel(placeList.get(i).getAsJsonObject().get("tel").getAsString())
+                        .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : "null")
+                        .storeSales(true)
+                        .storeDistance(placeList.get(i).getAsJsonObject().get("distance").getAsString())
+                        .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : "null")
+                        .build();
+                storeList.add(store);
+            }
+            pageNum++;
         }
         responseInfo.setResponseCode(0);
-        responseInfo.setResponseMsg(placeList.size() + "건 성공.");
+        responseInfo.setResponseMsg(storeList.size() + "건 성공.");
         responseInfo.setData(storeList);
 
         return responseInfo;
+    }
+
+    private int checkMaxPage(String url, String queryParameter, String typeParameter, String searchCoordParameter, int pageNum, String displayCountParameter, String isPlaceRecommendationReplaceParameter) {
+        int returnNum = pageNum;
+        int maxPage = 1;
+        while(returnNum<=maxPage){
+            RestTemplate restTemplate = new RestTemplate();
+            String loopUrl = url + queryParameter + typeParameter + searchCoordParameter + "page="+returnNum+"&" + displayCountParameter + isPlaceRecommendationReplaceParameter;
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Accept", "application/json");
+            HttpEntity<String> entity = new HttpEntity(headers);
+            ResponseEntity<String> response = restTemplate.exchange(loopUrl+"lang=ko", HttpMethod.GET, entity, String.class);
+            //{"error":{"code":"XE400","msg":"Bad Request.","displayMsg":"잘못된 요청입니다.","extraInfo":null}}
+            if(maxPage==1){
+                JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
+                JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
+                JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"),JsonObject.class);
+                maxPage = (place.getAsJsonObject().get("totalCount").getAsInt());
+            }
+
+            if(response.getBody().contains("XE400")){
+                break;
+            }else{
+                returnNum ++;
+            }
+
+        }
+        return returnNum;
+    }
+
+
+    // 37703991
+    @RequestMapping("/detail")
+    public ResponseInfo ojmStoreDetail(@RequestParam(name="storeId") String storeId){
+
+        ResponseInfo responseInfo = new ResponseInfo();
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+        HttpEntity<String> entity = new HttpEntity(headers);
+
+        String url = "https://map.naver.com/v5/api/sites/summary/"+storeId+"?lang=ko";
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        //System.out.println(response.getBody());
+
+        //responseInfo.getData(responseInfo.getBody());
+        JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
+        JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
+        System.out.println(jsonArray);
+        List<Menus> menusList = new ArrayList<>();
+        for(int i =0 ; i<jsonArray.size(); i++){
+            Menus menus = gson.fromJson(jsonArray.get(i),Menus.class);
+            menusList.add(menus);
+        }
+        return new ResponseInfo(0,"Success",menusList);
+        //return response.getBody();
     }
 
 }
