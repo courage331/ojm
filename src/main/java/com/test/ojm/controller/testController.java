@@ -106,7 +106,7 @@ ex)
 
         System.out.println("maxPage :" + maxPage);
 
-        while(pageNum<maxPage){
+        //while(pageNum<maxPage){
             RestTemplate restTemplate = new RestTemplate();
             String pageParameter = "page="+pageNum+"&";
             String url = urlParameter + queryParameter + typeParameter + searchCoordParameter + pageParameter + displayCountParameter + isPlaceRecommendationReplaceParameter;
@@ -139,7 +139,7 @@ ex)
                 storeList.add(store);
             }
             pageNum++;
-        }
+        //}
         responseInfo.setResponseCode(0);
         responseInfo.setResponseMsg(storeList.size() + "건 성공.");
         responseInfo.setData(storeList);
