@@ -10,6 +10,7 @@ import lombok.*;
 @ToString
 public class Store {
 
+    int storeKey;
     String storeThumUrl;    // [https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg](https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg)
     String storeName;       // - 가게 이름 : name or display ⇒ string
     String storeTel;        //    - 가게 연락처 : tel ⇒ string

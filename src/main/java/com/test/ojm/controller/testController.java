@@ -92,7 +92,7 @@ ex)
     ){
         ResponseInfo responseInfo = new ResponseInfo();
         List<Store> storeList = new ArrayList<>();
-
+        int storeIdx = 0;
 
         String urlParameter = "https://map.naver.com/v5/api/search?caller=pcweb&";
         String queryParameter = "query=음식점&";
@@ -125,6 +125,7 @@ ex)
 
             for(int i=0; i<placeList.size(); i++){
                 Store store = Store.builder()
+                        .storeKey(storeIdx++)
                         .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : "null")
                         .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : "null")
                         .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : "null"))
