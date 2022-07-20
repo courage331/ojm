@@ -126,15 +126,15 @@ ex)
             for(int i=0; i<placeList.size(); i++){
                 Store store = Store.builder()
                         .storeKey(storeIdx++)
-                        .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : "null")
-                        .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : "null")
-                        .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : "null"))
-                        .storeAddress(!placeList.get(i).getAsJsonObject().get("roadAddress").isJsonNull() ? placeList.get(i).getAsJsonObject().get("roadAddress").getAsString() : "null")
-                        .storeTel(!placeList.get(i).getAsJsonObject().get("tel").isJsonNull() ? placeList.get(i).getAsJsonObject().get("tel").getAsString() : "null")
-                        .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : "null")
+                        .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : null)
+                        .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : null)
+                        .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : null))
+                        .storeAddress(!placeList.get(i).getAsJsonObject().get("roadAddress").isJsonNull() ? placeList.get(i).getAsJsonObject().get("roadAddress").getAsString() : null)
+                        .storeTel(!placeList.get(i).getAsJsonObject().get("tel").isJsonNull() ? placeList.get(i).getAsJsonObject().get("tel").getAsString() : null)
+                        .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : null)
                         .storeSales(true)
-                        .storeDistance(!placeList.get(i).getAsJsonObject().get("distance").isJsonNull() ? placeList.get(i).getAsJsonObject().get("distance").getAsString() : "null")
-                        .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : "null")
+                        .storeDistance(!placeList.get(i).getAsJsonObject().get("distance").isJsonNull() ? placeList.get(i).getAsJsonObject().get("distance").getAsString() : null)
+                        .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : null)
                         .build();
                 storeList.add(store);
             }
