@@ -30,7 +30,7 @@ public class StoreService {
     @Autowired
     Gson gson;
 
-    static Map<String,Integer> map = new HashMap();
+    static int storeCategoryCode = 0;
     /**
      * ex)
      *     - thumUrl : [https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg](https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg)
@@ -87,6 +87,7 @@ public class StoreService {
                         .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : null)
                         .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : null)
                         .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : null))
+                        .storeCategoryCode(storeCategoryCode)
                         .storeAddress(!placeList.get(i).getAsJsonObject().get("roadAddress").isJsonNull() ? placeList.get(i).getAsJsonObject().get("roadAddress").getAsString() : null)
                         .storeTel(!placeList.get(i).getAsJsonObject().get("tel").isJsonNull() ? placeList.get(i).getAsJsonObject().get("tel").getAsString() : null)
                         .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : null)
@@ -107,27 +108,46 @@ public class StoreService {
 
     private String parseStoreCategory(String s) {
 
-        String [] storeCategoryList = {"전체","한식","일식","중식","아시아 음식","뷔페","분식","카페","기타"};
-//        StoreCategory a = StoreCategory.valueOf("한식");
-//        System.out.println("a : "+a);
+        String [] storeCategoryList = {
+                "전체",
+                "한식",
+                "일식",
+                "중식",
+                "양식",
+                "아시아 음식",
+                "뷔페",
+                "분식",
+                "카페",
+                "기타",
+                "카테고리없음"
+        };
 
         String returnString = s.equals("null") ? "null" : s.replace("[","").replace("]","").replaceAll("\"","").trim();
 
-        String resultString = "";
+        boolean categoryCodeChk = false;
+
         if(!returnString.equals("null")){
             String [] categoryArray = returnString.split(",");
             for(int i=0; i<categoryArray.length; i++){
-                for(int j=0; j<storeCategoryList.length; j++){
-                    if(categoryArray[i].equals(storeCategoryList[j])){
-                        categoryArray[i] = String.valueOf(j);
+                for(int j=0; j<storeCategoryList.length; j++) {
+                    if (categoryArray[i].equals(storeCategoryList[j])) {
+                        storeCategoryCode = j;
+                        categoryCodeChk = true;
                         break;
                     }
                 }
-                resultString += i!=categoryArray.length-1 ? categoryArray[i]+"," : categoryArray[i];
+                if(categoryCodeChk){
+                    break;
+                }
             }
+            if(!categoryCodeChk){
+                storeCategoryCode = 9; // 카테고리는 있지만 해당하는 카테고리가 없음 기타
+            }
+            return returnString;
+        }else{ // 카테고리없음 -> 분류없음
+            storeCategoryCode = 10;
+            return returnString;
         }
-
-        return resultString;
     }
 
     private int checkMaxPage(String url, String queryParameter, String typeParameter, String searchCoordParameter, int pageNum, String displayCountParameter, String isPlaceRecommendationReplaceParameter) {
