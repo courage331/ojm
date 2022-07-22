@@ -1,95 +1,49 @@
-package com.test.ojm.controller;
+package com.test.ojm.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.test.ojm.vo.Location;
 import com.test.ojm.vo.Menus;
 import com.test.ojm.vo.ResponseInfo;
 import com.test.ojm.vo.Store;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-@RestController
-@CrossOrigin(origins ="*")
-@RequestMapping("/test/ojm")
-public class testController {
+@Service
+@Slf4j
+public class StoreService {
 
     @Autowired
     Gson gson;
 
-    @Value("${spring.location.url}")
-    String locationUrl;
-    @Value("${spring.location.key}")
-    String restAPIKEY;
-
-    @RequestMapping("/location")
-    public String ojmLocation(@RequestParam(name="name") String name){
-
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/json");
-        headers.add("Authorization", "KakaoAK "+restAPIKEY);
-
-        HttpEntity<String> entity = new HttpEntity(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(locationUrl+name, HttpMethod.GET, entity, String.class);
-
-        JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
-        String documents = String.valueOf(jsonObject.get("documents"));
-//        System.out.println(documents);
-        List<Location> locationList = stringToArray(documents, Location[].class);
-        System.out.println(locationList);
-        System.out.println(locationList.get(0).getX());
-        System.out.println(locationList.get(0).getY());
-        System.out.println(locationList.get(0).getAddress());
-        System.out.println(locationList.get(0).getAddress_name());
-        System.out.println(locationList.get(0).getAddress_type());
-        System.out.println(locationList.get(0).getRoad_address());
-
-        return response.getBody();
-    }
-
-    /**  json String 을 list Object 로 변환 */
-    public static <Location> List<Location> stringToArray(String s, Class<Location[]> clazz) {
-        Location[] arr = new Gson().fromJson(s, clazz);
-        return Arrays.asList(arr); //or return Arrays.asList(new Gson().fromJson(s, clazz)); for a one-liner
-    }
-
-    // 최초 접속시 모든 음식점 선택
-    /*
-- 가게 이미지(url)  ⇒ string
-
-ex)
-    - thumUrl : [https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg](https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg)
-    - 가게 이름 : name or display ⇒ string
-    - 가게 연락처 : tel ⇒ string
-    - 가게와의 거리 : distance ⇒ string
-    - 영업 상태 ( 영업 중 : true, 영업 안함 : false ) ⇒ bool
-    - 영업시작시간 ( 자료조사) (bizhourInfo) ⇒
-    - 리뷰점수 or 리뷰 개수( **reviewCount ) → 셀레니움테스트**
-    - 주소 (address, abbrAddress, 도로명 : roadAddress)
-    - 가게 아이디값(id)
-    - 카테고리 (category) ⇒ ex) 한식 : 1, 일식 : 2
-
+    /**
+     * ex)
+     *     - thumUrl : [https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg](https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg)
+     *     - 가게 이름 : name or display ⇒ string
+     *     - 가게 연락처 : tel ⇒ string
+     *     - 가게와의 거리 : distance ⇒ string
+     *     - 영업 상태 ( 영업 중 : true, 영업 안함 : false ) ⇒ bool
+     *     - 영업시작시간 ( 자료조사) (bizhourInfo) ⇒
+     *     - 리뷰점수 or 리뷰 개수( **reviewCount ) → 셀레니움테스트**
+     *     - 주소 (address, abbrAddress, 도로명 : roadAddress)
+     *     - 가게 아이디값(id)
+     *     - 카테고리 (category) ⇒ ex) 한식 : 1, 일식 : 2
+     *
+     *
      */
-    @RequestMapping("/store")
-    public ResponseInfo ojmStore(
-            @RequestParam(name="searchCoord") String searchCoord
-    ){
+
+    public ResponseInfo storeInfo(String searchCoord){
         ResponseInfo responseInfo = new ResponseInfo();
         List<Store> storeList = new ArrayList<>();
         int storeIdx = 0;
@@ -183,12 +137,7 @@ ex)
         return returnNum;
     }
 
-
-
-    // 37703991
-    @RequestMapping("/detail")
-    public ResponseInfo ojmStoreDetail(@RequestParam(name="storeId") String storeId){
-
+    public ResponseInfo storeDetailInfo(String storeId){
         ResponseInfo responseInfo = new ResponseInfo();
         RestTemplate restTemplate = new RestTemplate();
 
@@ -212,8 +161,9 @@ ex)
             Menus menus = gson.fromJson(jsonArray.get(i),Menus.class);
             menusList.add(menus);
         }
-        return new ResponseInfo(0,"Success",menusList);
-        //return response.getBody();
+        responseInfo.setResponseCode(0);
+        responseInfo.setResponseMsg("storeDetailInfo Success");
+        responseInfo.setData(menusList);
+        return responseInfo;
     }
-
 }
