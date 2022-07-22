@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.test.ojm.vo.Menus;
 import com.test.ojm.vo.ResponseInfo;
 import com.test.ojm.vo.Store;
+import com.test.ojm.vo.StoreCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -18,7 +19,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -27,6 +30,7 @@ public class StoreService {
     @Autowired
     Gson gson;
 
+    static Map<String,Integer> map = new HashMap();
     /**
      * ex)
      *     - thumUrl : [https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg](https://ldb-phinf.pstatic.net/20220318_83/1647570614790jNrs4_JPEG/%BC%F6%C1%A4%B5%CA_%B0%A5%BA%F1%BE%E7%B3%E4%B5%A4%B9%E4.jpg)
@@ -58,7 +62,7 @@ public class StoreService {
 
         int maxPage = checkMaxPage(urlParameter,queryParameter,typeParameter,searchCoordParameter,pageNum,displayCountParameter,isPlaceRecommendationReplaceParameter);
 
-        System.out.println("maxPage :" + maxPage);
+        //System.out.println("maxPage :" + maxPage);
 
         while(pageNum<maxPage){
             RestTemplate restTemplate = new RestTemplate();
@@ -67,7 +71,7 @@ public class StoreService {
             restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "application/json");
-            System.out.println("url : " + url);
+            //System.out.println("url : " + url);
             HttpEntity<String> entity = new HttpEntity(headers);
             ResponseEntity<String> response = restTemplate.exchange(url+"lang=ko", HttpMethod.GET, entity, String.class);
             //System.out.println(response.getBody());
@@ -103,9 +107,27 @@ public class StoreService {
 
     private String parseStoreCategory(String s) {
 
+        String [] storeCategoryList = {"전체","한식","일식","중식","아시아 음식","뷔페","분식","카페","기타"};
+//        StoreCategory a = StoreCategory.valueOf("한식");
+//        System.out.println("a : "+a);
+
         String returnString = s.equals("null") ? "null" : s.replace("[","").replace("]","").replaceAll("\"","").trim();
 
-        return returnString;
+        String resultString = "";
+        if(!returnString.equals("null")){
+            String [] categoryArray = returnString.split(",");
+            for(int i=0; i<categoryArray.length; i++){
+                for(int j=0; j<storeCategoryList.length; j++){
+                    if(categoryArray[i].equals(storeCategoryList[j])){
+                        categoryArray[i] = String.valueOf(j);
+                        break;
+                    }
+                }
+                resultString += i!=categoryArray.length-1 ? categoryArray[i]+"," : categoryArray[i];
+            }
+        }
+
+        return resultString;
     }
 
     private int checkMaxPage(String url, String queryParameter, String typeParameter, String searchCoordParameter, int pageNum, String displayCountParameter, String isPlaceRecommendationReplaceParameter) {
@@ -155,7 +177,7 @@ public class StoreService {
         //responseInfo.getData(responseInfo.getBody());
         JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
         JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
-        System.out.println(jsonArray);
+        //System.out.println(jsonArray);
         List<Menus> menusList = new ArrayList<>();
         for(int i =0 ; i<jsonArray.size(); i++){
             Menus menus = gson.fromJson(jsonArray.get(i),Menus.class);
