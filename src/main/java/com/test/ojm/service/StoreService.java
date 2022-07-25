@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.spring.web.json.Json;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -58,14 +59,13 @@ public class StoreService {
             String queryParameter = "query=음식점&";
             String typeParameter = "type=all&";
             String searchCoordParameter = "searchCoord=" + searchCoord + "&"; // searchCoord=127.25040539999999;37.657918499999795&
-
             String displayCountParameter = "displayCount=100&";
             String isPlaceRecommendationReplaceParameter = "isPlaceRecommendationReplace=true";
 
             int maxPage = checkMaxPage(urlParameter, queryParameter, typeParameter, searchCoordParameter, pageNum, displayCountParameter, isPlaceRecommendationReplaceParameter);
 
             //maxPage를 구하는 과정에서 Error가 발생한 경우
-            if(maxPage == -1){
+            if (maxPage == -1) {
                 responseInfo.setResponseCode(-2);
                 responseInfo.setResponseMsg("storeInfo Page를 찾는 과정에서 에러 발생");
                 return responseInfo;
@@ -78,29 +78,26 @@ public class StoreService {
                 restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("Accept", "application/json");
-                //System.out.println("url : " + url);
                 HttpEntity<String> entity = new HttpEntity(headers);
                 ResponseEntity<String> response = restTemplate.exchange(url + "lang=ko", HttpMethod.GET, entity, String.class);
-                //System.out.println(response.getBody());
-                //{"error":{"code":"XE400","msg":"Bad Request.","displayMsg":"잘못된 요청입니다.","extraInfo":null}}
+
                 JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
                 JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
                 JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"), JsonObject.class);
                 JsonArray placeList = gson.fromJson(place.getAsJsonObject().get("list"), JsonArray.class);
-
-                for (int i = 0; i < placeList.size(); i++) {
+                for (JsonElement jsonElement : placeList) {
                     Store store = Store.builder()
                             .storeKey(storeIdx++)
-                            .storeId(!placeList.get(i).getAsJsonObject().get("id").isJsonNull() ? placeList.get(i).getAsJsonObject().get("id").getAsString() : null)
-                            .storeName(!placeList.get(i).getAsJsonObject().get("name").isJsonNull() ? placeList.get(i).getAsJsonObject().get("name").getAsString() : null)
-                            .storeCategory(parseStoreCategory(!placeList.get(i).getAsJsonObject().get("category").isJsonNull() ? placeList.get(i).getAsJsonObject().get("category").getAsJsonArray().toString() : null))
+                            .storeId(!jsonElement.getAsJsonObject().get("id").isJsonNull() ? jsonElement.getAsJsonObject().get("id").getAsString() : null)
+                            .storeName(!jsonElement.getAsJsonObject().get("name").isJsonNull() ? jsonElement.getAsJsonObject().get("name").getAsString() : null)
+                            .storeCategory(parseStoreCategory(!jsonElement.getAsJsonObject().get("category").isJsonNull() ? jsonElement.getAsJsonObject().get("category").getAsJsonArray().toString() : null))
                             .storeCategoryCode(storeCategoryCode)
-                            .storeAddress(!placeList.get(i).getAsJsonObject().get("roadAddress").isJsonNull() ? placeList.get(i).getAsJsonObject().get("roadAddress").getAsString() : null)
-                            .storeTel(!placeList.get(i).getAsJsonObject().get("tel").isJsonNull() ? placeList.get(i).getAsJsonObject().get("tel").getAsString() : null)
-                            .storeBizhourInfo(!placeList.get(i).getAsJsonObject().get("bizhourInfo").isJsonNull() ? placeList.get(i).getAsJsonObject().get("bizhourInfo").getAsString() : null)
+                            .storeAddress(!jsonElement.getAsJsonObject().get("roadAddress").isJsonNull() ? jsonElement.getAsJsonObject().get("roadAddress").getAsString() : null)
+                            .storeTel(!jsonElement.getAsJsonObject().get("tel").isJsonNull() ? jsonElement.getAsJsonObject().get("tel").getAsString() : null)
+                            .storeBizhourInfo(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : null)
                             .storeSales(true)
-                            .storeDistance(!placeList.get(i).getAsJsonObject().get("distance").isJsonNull() ? placeList.get(i).getAsJsonObject().get("distance").getAsString() : null)
-                            .storeThumUrl(!placeList.get(i).getAsJsonObject().get("thumUrl").isJsonNull() ? placeList.get(i).getAsJsonObject().get("thumUrl").getAsString() : null)
+                            .storeDistance(!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? jsonElement.getAsJsonObject().get("distance").getAsString() : null)
+                            .storeThumUrl(!jsonElement.getAsJsonObject().get("thumUrl").isJsonNull() ? jsonElement.getAsJsonObject().get("thumUrl").getAsString() : null)
                             .build();
                     storeList.add(store);
                 }
@@ -139,6 +136,7 @@ public class StoreService {
 
         if (!returnString.equals("null")) {
             String[] categoryArray = returnString.split(",");
+
             for (int i = 0; i < categoryArray.length; i++) {
                 for (int j = 0; j < storeCategoryList.length; j++) {
                     if (categoryArray[i].equals(storeCategoryList[j])) {
@@ -188,12 +186,12 @@ public class StoreService {
                 }
 
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             /**
              * Error 발생시에 -1로 리터하기
              * */
             returnNum = -1;
-            log.info("checkMaxPage Try Catch Error : "+e.getMessage());
+            log.info("checkMaxPage Try Catch Error : " + e.getMessage());
         }
 
         return returnNum;
@@ -214,16 +212,16 @@ public class StoreService {
 
             JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
             JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
-            //System.out.println(jsonArray);
+
             List<Menus> menusList = new ArrayList<>();
-            for(JsonElement jsonElement : jsonArray){
+            for (JsonElement jsonElement : jsonArray) {
                 menusList.add(gson.fromJson(jsonElement, Menus.class));
             }
 
             responseInfo.setResponseCode(0);
             responseInfo.setResponseMsg("storeDetailInfo Success");
             responseInfo.setData(menusList);
-        }catch(Exception e){
+        } catch (Exception e) {
             responseInfo.setResponseCode(-1);
             responseInfo.setResponseMsg("storeDetailInfo Fail");
             responseInfo.setData(e.getMessage());
