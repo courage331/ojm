@@ -36,31 +36,28 @@ public class LocationService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseInfo responseInfo = new ResponseInfo();
 
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", "application/json");
-        headers.add("Authorization", "KakaoAK "+restAPIKEY);
+        try{
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Accept", "application/json");
+            headers.add("Authorization", "KakaoAK "+restAPIKEY);
 
-        HttpEntity<String> entity = new HttpEntity(headers);
+            HttpEntity<String> entity = new HttpEntity(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(locationUrl+name, HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(locationUrl+name, HttpMethod.GET, entity, String.class);
 
-        JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
-        String documents = String.valueOf(jsonObject.get("documents"));
-//        System.out.println(documents);
-        List<Location> locationList = stringToArray(documents, Location[].class);
-//        System.out.println(locationList);
-//        System.out.println(locationList.get(0).getX());
-//        System.out.println(locationList.get(0).getY());
-//        System.out.println(locationList.get(0).getAddress());
-//        System.out.println(locationList.get(0).getAddress_name());
-//        System.out.println(locationList.get(0).getAddress_type());
-//        System.out.println(locationList.get(0).getRoad_address());
+            JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
+            List<Location> locationList = stringToArray(String.valueOf(jsonObject.get("documents")), Location[].class);
 
-        responseInfo.setResponseCode(0);
-        responseInfo.setResponseMsg("ojmLocation Success");
-        responseInfo.setData(locationList);
+            responseInfo.setResponseCode(0);
+            responseInfo.setResponseMsg("ojmLocation Success");
+            responseInfo.setData(locationList);
 
+        }catch(Exception e){
+            responseInfo.setResponseCode(-1);
+            responseInfo.setResponseMsg("ojmLocation Fail");
+            responseInfo.setData(e.getMessage());
+        }
         return responseInfo;
     }
 

@@ -31,7 +31,7 @@ public class OJMController {
             produces = "application/json",
             consumes = "application/json",
             protocols = "http",
-//			response = Orders.class,
+			response = ResponseInfo.class,
             responseHeaders = {
                     //header info
             })
@@ -54,7 +54,7 @@ public class OJMController {
             produces = "application/json",
             consumes = "application/json",
             protocols = "http",
-//			response = Orders.class,
+			response = ResponseInfo.class,
             responseHeaders = {
                     //header info
             })
@@ -76,7 +76,7 @@ public class OJMController {
             produces = "application/json",
             consumes = "application/json",
             protocols = "http",
-//			response = Orders.class,
+			response = ResponseInfo.class,
             responseHeaders = {
                     //header info
             })
