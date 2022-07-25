@@ -109,17 +109,17 @@ public class StoreService {
     private String parseStoreCategory(String s) {
 
         String [] storeCategoryList = {
-                "전체",
-                "한식",
-                "일식",
-                "중식",
-                "양식",
-                "아시아 음식",
-                "뷔페",
-                "분식",
-                "카페",
-                "기타",
-                "카테고리없음"
+                "전체", // 0
+                "한식", // 1
+                "일식", // 2
+                "중식", // 3
+                "양식", // 4
+                "아시아 음식", // 5
+                "뷔페", // 6
+                "분식", // 7
+                "카페", // 8
+                "기타", // 9
+                "카테고리없음" //10
         };
 
         String returnString = s.equals("null") ? "null" : s.replace("[","").replace("]","").replaceAll("\"","").trim();
