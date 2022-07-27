@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.test.ojm.vo.Menus;
 import com.test.ojm.vo.ResponseInfo;
 import com.test.ojm.vo.Store;
-import com.test.ojm.vo.StoreCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -17,13 +16,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import springfox.documentation.spring.web.json.Json;
+
 
 import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -51,6 +52,7 @@ public class StoreService {
     public ResponseInfo storeInfo(String searchCoord) {
         ResponseInfo responseInfo = new ResponseInfo();
         List<Store> storeList = new ArrayList<>();
+        List<String> bizHourInfoList = new ArrayList<>();
         try {
             int storeIdx = 0;
             int pageNum = 1;
@@ -85,6 +87,7 @@ public class StoreService {
                 JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
                 JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"), JsonObject.class);
                 JsonArray placeList = gson.fromJson(place.getAsJsonObject().get("list"), JsonArray.class);
+
                 for (JsonElement jsonElement : placeList) {
                     Store store = Store.builder()
                             .storeKey(storeIdx++)
@@ -95,17 +98,20 @@ public class StoreService {
                             .storeAddress(!jsonElement.getAsJsonObject().get("roadAddress").isJsonNull() ? jsonElement.getAsJsonObject().get("roadAddress").getAsString() : null)
                             .storeTel(!jsonElement.getAsJsonObject().get("tel").isJsonNull() ? jsonElement.getAsJsonObject().get("tel").getAsString() : null)
                             .storeBizhourInfo(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : null)
-                            .storeSales(true)
+                            .storeSales(chkBizHour(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : "null"))
                             .storeDistance(!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? jsonElement.getAsJsonObject().get("distance").getAsString() : null)
                             .storeThumUrl(!jsonElement.getAsJsonObject().get("thumUrl").isJsonNull() ? jsonElement.getAsJsonObject().get("thumUrl").getAsString() : null)
                             .build();
                     storeList.add(store);
+                    bizHourInfoList.add(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : null);
                 }
                 pageNum++;
             }
             responseInfo.setResponseCode(0);
             responseInfo.setResponseMsg(storeList.size() + "건 성공.");
             responseInfo.setData(storeList);
+            //responseInfo.setData(bizHourInfoList);
+
         } catch (Exception e) {
             responseInfo.setResponseCode(-1);
             responseInfo.setResponseMsg("storeInfo Fail");
@@ -195,6 +201,40 @@ public class StoreService {
         }
 
         return returnNum;
+    }
+
+    public boolean chkBizHour(String bizInfo){
+//        System.out.println(bizInfo);
+        String [] bizArray = bizInfo.split("|");
+//        String
+        if(bizInfo.equals("null")){
+            return true;
+        }
+        LocalDate date = LocalDate.now();  // 2022-07-27
+        /** 일(0) 월(1) 화(2) 수(3) 목(4) 금(5) 토(6) */
+        int year = date.getYear();       //2022
+        int monthValue = date.getMonthValue(); // 07
+        int dayOfMonth = date.getDayOfMonth(); // 27
+        int dayOfWeekValue = date.getDayOfWeek().getValue(); // 목요일 -> 4
+
+        LocalTime time = LocalTime.now();
+        int hour = time.getHour();
+        int minute = time.getMinute();
+        int second = time.getSecond();
+        // 현재시간 출력
+        System.out.println(time);  // 06:20:57.008731300
+        // 포맷 정의하기
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH시 mm분 ss초");
+        // 포맷 적용하기
+        String formatedNow = time.format(formatter);
+
+
+
+
+        //System.out.println("");
+
+
+        return true;
     }
 
     public ResponseInfo storeDetailInfo(String storeId) {

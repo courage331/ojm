@@ -1,6 +1,5 @@
 package com.test.ojm.controller;
 
-import com.google.gson.Gson;
 import com.test.ojm.service.LocationService;
 import com.test.ojm.service.StoreService;
 import com.test.ojm.vo.ResponseInfo;
@@ -9,7 +8,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
