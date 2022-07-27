@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class StoreService {
         ResponseInfo responseInfo = new ResponseInfo();
         List<Store> storeList = new ArrayList<>();
         List<String> bizHourInfoList = new ArrayList<>();
-        try {
+//        try {
             int storeIdx = 0;
             int pageNum = 1;
 
@@ -99,24 +100,23 @@ public class StoreService {
                             .storeTel(!jsonElement.getAsJsonObject().get("tel").isJsonNull() ? jsonElement.getAsJsonObject().get("tel").getAsString() : null)
                             .storeBizhourInfo(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : null)
                             .storeSales(chkBizHour(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : "null"))
-                            .storeDistance(!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? jsonElement.getAsJsonObject().get("distance").getAsString() : null)
+                            .storeDistance(parseDistance(!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? (jsonElement.getAsJsonObject().get("distance").getAsString()) : "null"))
+//                            .storeDistance(!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? (jsonElement.getAsJsonObject().get("distance").getAsString()) : "null")
                             .storeThumUrl(!jsonElement.getAsJsonObject().get("thumUrl").isJsonNull() ? jsonElement.getAsJsonObject().get("thumUrl").getAsString() : null)
                             .build();
                     storeList.add(store);
-                    bizHourInfoList.add(!jsonElement.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonElement.getAsJsonObject().get("bizhourInfo").getAsString() : null);
+                    //parseDistance((!jsonElement.getAsJsonObject().get("name").isJsonNull() ? jsonElement.getAsJsonObject().get("name").getAsString() : null) , (!jsonElement.getAsJsonObject().get("distance").isJsonNull() ? (jsonElement.getAsJsonObject().get("distance").getAsString()) : "null"));
                 }
                 pageNum++;
             }
             responseInfo.setResponseCode(0);
             responseInfo.setResponseMsg(storeList.size() + "건 성공.");
             responseInfo.setData(storeList);
-            //responseInfo.setData(bizHourInfoList);
-
-        } catch (Exception e) {
-            responseInfo.setResponseCode(-1);
-            responseInfo.setResponseMsg("storeInfo Fail");
-            responseInfo.setData(e.getMessage());
-        }
+//        } catch (Exception e) {
+//            responseInfo.setResponseCode(-1);
+//            responseInfo.setResponseMsg("storeInfo Fail");
+//            responseInfo.setData(e.getMessage());
+//        }
         return responseInfo;
     }
 
@@ -203,10 +203,21 @@ public class StoreService {
         return returnNum;
     }
 
+    public int parseDistance(String distance){
+
+        if(distance.equals("null")){
+            //System.out.println("null");
+            return -1;
+        }else{
+            return Integer.parseInt(distance.split("\\.")[0].trim());
+        }
+    }
+
     public boolean chkBizHour(String bizInfo){
 //        System.out.println(bizInfo);
         String [] bizArray = bizInfo.split("|");
 //        String
+        // 나중에 영업정보 없음 관련해서 띄어줄 예정
         if(bizInfo.equals("null")){
             return true;
         }
@@ -222,7 +233,7 @@ public class StoreService {
         int minute = time.getMinute();
         int second = time.getSecond();
         // 현재시간 출력
-        System.out.println(time);  // 06:20:57.008731300
+        //System.out.println(time);  // 06:20:57.008731300
         // 포맷 정의하기
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH시 mm분 ss초");
         // 포맷 적용하기
