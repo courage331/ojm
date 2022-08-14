@@ -15,7 +15,7 @@ public class Store {
     String storeName;       // - 가게 이름 : name or display ⇒ string
     String storeTel;        //    - 가게 연락처 : tel ⇒ string
     int storeDistance;   //    - 가게와의 거리 : distance ⇒ string
-    Boolean storeSales;      //    - 영업 상태 ( 영업 중 : true, 영업 안함 : false ) ⇒ bool
+//    Boolean storeSales;      //    - 영업 상태 ( 영업 중 : true, 영업 안함 : false ) ⇒ bool
     String storeBizhourInfo;//    - 영업시작시간 ( 자료조사) (bizhourInfo) ⇒
 //    String storeReviewCount;//            - 리뷰점수 or 리뷰 개수( **reviewCount ) → 셀레니움테스트**
     String storeAddress;    //          - 주소 (address, abbrAddress, 도로명 : roadAddress)
