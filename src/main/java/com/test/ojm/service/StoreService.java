@@ -131,7 +131,7 @@ public class StoreService {
                 "카테고리없음" //10
         };
 
-        String returnString = s.equals("null") ? "null" : s.replace("[", "").replace("]", "").replaceAll("\"", "").trim();
+        String returnString = "null".equals(s) ? "null" : s.replace("[", "").replace("]", "").replaceAll("\"", "").trim();
 
         boolean categoryCodeChk = false;
 
