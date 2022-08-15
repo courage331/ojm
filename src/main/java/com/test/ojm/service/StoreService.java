@@ -89,7 +89,7 @@ public class StoreService {
                         .storeKey(storeIdx++)
                         .storeId(!jsonElement.getAsJsonObject().get("id").isJsonNull() ? jsonElement.getAsJsonObject().get("id").getAsString() : null)
                         .storeName(!jsonElement.getAsJsonObject().get("name").isJsonNull() ? jsonElement.getAsJsonObject().get("name").getAsString() : null)
-                        .storeCategory(parseStoreCategory(!jsonElement.getAsJsonObject().get("category").isJsonNull() ? jsonElement.getAsJsonObject().get("category").getAsJsonArray().toString() : null))
+                        .storeCategory(!jsonElement.getAsJsonObject().get("category").isJsonNull() ? parseStoreCategory(jsonElement.getAsJsonObject().get("category").getAsJsonArray().toString()) : null)
                         .storeCategoryCode(storeCategoryCode)
                         .storeAddress(!jsonElement.getAsJsonObject().get("roadAddress").isJsonNull() ? jsonElement.getAsJsonObject().get("roadAddress").getAsString() : null)
                         .storeTel(!jsonElement.getAsJsonObject().get("tel").isJsonNull() ? jsonElement.getAsJsonObject().get("tel").getAsString() : null)
@@ -227,7 +227,7 @@ public class StoreService {
         map.put("토요일",6);
 
 
-        try {
+        //try {
             restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
             HttpHeaders headers = new HttpHeaders();
             headers.add("Accept", "application/json");
@@ -246,36 +246,39 @@ public class StoreService {
                 menusList.add(gson.fromJson(jsonElement, Menus.class));
             }
 
-            List<BizHourInfo> bizHourInfoList = new ArrayList<>();
             Boolean bizHourInfo = false;
 
 
-            for (JsonElement jsonElement : jsonArray) {
-                BizHourInfo bizHourInfoElement = gson.fromJson(jsonElement, BizHourInfo.class);
-                switch(bizHourInfoElement.getType()){
-                    case "매일":
-                        bizHourInfo = chkBizHour(bizHourInfoElement);
-                        break;
-                    case "평일":
-                        if(dayOfWeekValue>=1 && dayOfWeekValue<=5){
-                            bizHourInfo = chkBizHour(bizHourInfoElement);
-                        }
-                        break;
-                    case "주말":
-                        if(dayOfWeekValue==0 || dayOfWeekValue==6){
-                            bizHourInfo = chkBizHour(bizHourInfoElement);
-                        }
-                        break;
-                    default:
-                        if(map.get(bizHourInfoElement.getType())==dayOfWeekValue){
-                            bizHourInfo = chkBizHour(bizHourInfoElement);
-                        }
-                        break;
-                }
-                if(bizHourInfo){
-                    break;
-                }
-            }
+//            for (JsonElement jsonElement : jsonArray) {
+//                BizHourInfo bizHourInfoElement = gson.fromJson(jsonElement, BizHourInfo.class);
+//                if("null".equals(bizHourInfoElement.getType())){
+//                    System.out.println("null");
+//                    continue;
+//                }
+//                switch(bizHourInfoElement.getType()){
+//                    case "매일":
+//                        bizHourInfo = chkBizHour(bizHourInfoElement);
+//                        break;
+//                    case "평일":
+//                        if(dayOfWeekValue>=1 && dayOfWeekValue<=5){
+//                            bizHourInfo = chkBizHour(bizHourInfoElement);
+//                        }
+//                        break;
+//                    case "주말":
+//                        if(dayOfWeekValue==0 || dayOfWeekValue==6){
+//                            bizHourInfo = chkBizHour(bizHourInfoElement);
+//                        }
+//                        break;
+//                    default:
+//                        if(map.get(bizHourInfoElement.getType())==dayOfWeekValue){
+//                            bizHourInfo = chkBizHour(bizHourInfoElement);
+//                        }
+//                        break;
+//                }
+//                if(bizHourInfo){
+//                    break;
+//                }
+//            }
 
             storeDetail.setMenuList(menusList);
             storeDetail.setBizHourInfo(bizHourInfo);
@@ -283,11 +286,11 @@ public class StoreService {
             responseInfo.setResponseCode(0);
             responseInfo.setResponseMsg("storeDetailInfo Success");
             responseInfo.setData(storeDetail);
-        } catch (Exception e) {
-            responseInfo.setResponseCode(-1);
-            responseInfo.setResponseMsg("storeDetailInfo Fail");
-            responseInfo.setData(e.getMessage());
-        }
+//        } catch (Exception e) {
+//            responseInfo.setResponseCode(-1);
+//            responseInfo.setResponseMsg("storeDetailInfo Fail");
+//            responseInfo.setData(e.getMessage());
+//        }
         return responseInfo;
     }
 
