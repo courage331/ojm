@@ -239,11 +239,23 @@ public class StoreService {
 
             JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
             JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
+            JsonArray jsonArray1 = gson.fromJson(jsonObject.getAsJsonObject().get("images"),JsonArray.class);
+            JsonArray jsonArray2 = gson.fromJson(jsonObject.getAsJsonObject().get("menuImages"),JsonArray.class);
 
             StoreDetail storeDetail = new StoreDetail();
             List<Menus> menusList = new ArrayList<>();
+            List<StoreImages> storeImagesList = new ArrayList<>();
+            List<MenuImages> menuImagesList = new ArrayList<>();
             for (JsonElement jsonElement : jsonArray) {
                 menusList.add(gson.fromJson(jsonElement, Menus.class));
+            }
+
+            for (JsonElement jsonElement : jsonArray1) {
+                storeImagesList.add(gson.fromJson(jsonElement, StoreImages.class));
+            }
+
+            for (JsonElement jsonElement : jsonArray2) {
+                menuImagesList.add(gson.fromJson(jsonElement, MenuImages.class));
             }
 
             Boolean bizHourInfo = false;
@@ -279,9 +291,24 @@ public class StoreService {
 //                    break;
 //                }
 //            }
+            StoreLocation storeLocation = new StoreLocation();
+            if(!jsonObject.getAsJsonObject().get("x").isJsonNull() && !jsonObject.getAsJsonObject().get("y").isJsonNull()){
+                storeLocation = new StoreLocation(jsonObject.getAsJsonObject().get("x").getAsString(),jsonObject.getAsJsonObject().get("y").getAsString());
+            }else{
+                storeLocation = null;
+            }
 
-            storeDetail.setMenuList(menusList);
-            storeDetail.setBizHourInfo(bizHourInfo);
+            storeDetail.setStoreAddress(!jsonObject.getAsJsonObject().get("fullAddress").isJsonNull() ? jsonObject.getAsJsonObject().get("fullAddress").getAsString() : null);
+            storeDetail.setStoreName(!jsonObject.getAsJsonObject().get("name").isJsonNull() ? jsonObject.getAsJsonObject().get("name").getAsString() : null);
+            storeDetail.setStoreTel(!jsonObject.getAsJsonObject().get("phone").isJsonNull() ? jsonObject.getAsJsonObject().get("phone").getAsString() : null);
+            storeDetail.setStoreBizHourInfo(!jsonObject.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonObject.getAsJsonObject().get("bizhourInfo").getAsString() : null);
+            storeDetail.setStoreBizHourInfo(!jsonObject.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonObject.getAsJsonObject().get("bizhourInfo").getAsString() : null);
+            storeDetail.setStoreCoords(storeLocation);
+
+            storeDetail.setStoreMenuList(menusList);
+            storeDetail.setStoreImage(storeImagesList);
+            storeDetail.setStoreMenuImage(menuImagesList);
+            //storeDetail.setBizHourInfo(bizHourInfo);
 
             responseInfo.setResponseCode(0);
             responseInfo.setResponseMsg("storeDetailInfo Success");
