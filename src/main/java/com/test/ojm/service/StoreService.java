@@ -212,6 +212,12 @@ public class StoreService {
         ResponseInfo responseInfo = new ResponseInfo();
         RestTemplate restTemplate = new RestTemplate();
 
+        StoreDetail storeDetail = new StoreDetail();
+        List<Menus> menusList = new ArrayList<>();
+        List<StoreImages> storeImagesList = new ArrayList<>();
+        List<MenuImages> menuImagesList = new ArrayList<>();
+        List<StoreOption> storeOptionList = new ArrayList<>();
+
         // 현재 날짜 구하기 (시스템 시계, 시스템 타임존)
 
         /** 일(0), 월(1), 화(2), 수(3), 목(4), 금(5), 토(6) */
@@ -238,19 +244,21 @@ public class StoreService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
-            JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
+            JsonArray jsonArray = new JsonArray();
+            if(jsonObject.getAsJsonObject().get("menus").isJsonNull()){
+
+            }else{
+                jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
+                for (JsonElement jsonElement : jsonArray) {
+                    menusList.add(gson.fromJson(jsonElement, Menus.class));
+                }
+            }
             JsonArray jsonArray1 = gson.fromJson(jsonObject.getAsJsonObject().get("images"),JsonArray.class);
             JsonArray jsonArray2 = gson.fromJson(jsonObject.getAsJsonObject().get("menuImages"),JsonArray.class);
             JsonArray jsonArray3 = gson.fromJson(jsonObject.getAsJsonObject().get("options"),JsonArray.class);
 
-            StoreDetail storeDetail = new StoreDetail();
-            List<Menus> menusList = new ArrayList<>();
-            List<StoreImages> storeImagesList = new ArrayList<>();
-            List<MenuImages> menuImagesList = new ArrayList<>();
-            List<StoreOption> storeOptionList = new ArrayList<>();
-            for (JsonElement jsonElement : jsonArray) {
-                menusList.add(gson.fromJson(jsonElement, Menus.class));
-            }
+
+
 
             for (JsonElement jsonElement : jsonArray1) {
                 storeImagesList.add(gson.fromJson(jsonElement, StoreImages.class));
