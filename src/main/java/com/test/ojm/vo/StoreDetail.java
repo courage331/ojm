@@ -18,4 +18,7 @@ public class StoreDetail {
     String storeBizHourInfo; //가게 영업 시간 내용 - bizHourInfo
     StoreLocation storeCoords; //- 네이버 detail 호출 할 때 x, y 값으로 나옴
     boolean storeBizState; //가게 영업 상태
+    String storeDescription; //가게 설명 -description
+    String storeWay; //도보 설명 - way
+    List<StoreOption>storeOptions; //가게 옵션(포장,화장실 등) - options
 }

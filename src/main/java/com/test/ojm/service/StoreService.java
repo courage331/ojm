@@ -241,11 +241,13 @@ public class StoreService {
             JsonArray jsonArray = gson.fromJson(jsonObject.getAsJsonObject().get("menus"), JsonArray.class);
             JsonArray jsonArray1 = gson.fromJson(jsonObject.getAsJsonObject().get("images"),JsonArray.class);
             JsonArray jsonArray2 = gson.fromJson(jsonObject.getAsJsonObject().get("menuImages"),JsonArray.class);
+            JsonArray jsonArray3 = gson.fromJson(jsonObject.getAsJsonObject().get("options"),JsonArray.class);
 
             StoreDetail storeDetail = new StoreDetail();
             List<Menus> menusList = new ArrayList<>();
             List<StoreImages> storeImagesList = new ArrayList<>();
             List<MenuImages> menuImagesList = new ArrayList<>();
+            List<StoreOption> storeOptionList = new ArrayList<>();
             for (JsonElement jsonElement : jsonArray) {
                 menusList.add(gson.fromJson(jsonElement, Menus.class));
             }
@@ -258,8 +260,11 @@ public class StoreService {
                 menuImagesList.add(gson.fromJson(jsonElement, MenuImages.class));
             }
 
-            Boolean bizHourInfo = false;
+            for (JsonElement jsonElement : jsonArray3) {
+                storeOptionList.add(gson.fromJson(jsonElement, StoreOption.class));
+            }
 
+            Boolean bizHourInfo = false;
 
 //            for (JsonElement jsonElement : jsonArray) {
 //                BizHourInfo bizHourInfoElement = gson.fromJson(jsonElement, BizHourInfo.class);
@@ -299,6 +304,8 @@ public class StoreService {
             }
 
             storeDetail.setStoreAddress(!jsonObject.getAsJsonObject().get("fullAddress").isJsonNull() ? jsonObject.getAsJsonObject().get("fullAddress").getAsString() : null);
+            storeDetail.setStoreDescription(!jsonObject.getAsJsonObject().get("description").isJsonNull() ? jsonObject.getAsJsonObject().get("description").getAsString() : null);
+            storeDetail.setStoreWay(!jsonObject.getAsJsonObject().get("way").isJsonNull() ? jsonObject.getAsJsonObject().get("way").getAsString() : null);
             storeDetail.setStoreName(!jsonObject.getAsJsonObject().get("name").isJsonNull() ? jsonObject.getAsJsonObject().get("name").getAsString() : null);
             storeDetail.setStoreTel(!jsonObject.getAsJsonObject().get("phone").isJsonNull() ? jsonObject.getAsJsonObject().get("phone").getAsString() : null);
             storeDetail.setStoreBizHourInfo(!jsonObject.getAsJsonObject().get("bizhourInfo").isJsonNull() ? jsonObject.getAsJsonObject().get("bizhourInfo").getAsString() : null);
@@ -308,6 +315,7 @@ public class StoreService {
             storeDetail.setStoreMenuList(menusList);
             storeDetail.setStoreImage(storeImagesList);
             storeDetail.setStoreMenuImage(menuImagesList);
+            storeDetail.setStoreOptions(storeOptionList);
             //storeDetail.setBizHourInfo(bizHourInfo);
 
             responseInfo.setResponseCode(0);

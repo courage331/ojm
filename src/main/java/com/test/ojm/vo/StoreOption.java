@@ -9,7 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoreLocation {
-        String storeLatitude; // x
-        String storeLongitude; // y
+public class StoreOption {
+    String id;
+    String name;
+    String isCheck;
+    String order;
+    String iconURL;
+    String desc;
 }
