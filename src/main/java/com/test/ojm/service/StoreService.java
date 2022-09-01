@@ -46,13 +46,14 @@ public class StoreService {
      */
 
     public ResponseInfo storeInfo(String searchCoord) {
+        log.info("searchCoord : "+searchCoord);
         ResponseInfo responseInfo = new ResponseInfo();
         List<Store> storeList = new ArrayList<>();
         List<String> bizHourInfoList = new ArrayList<>();
 //        try {
         int storeIdx = 0;
         int pageNum = 1;
-
+        // https://map.naver.com/v5/api/search?caller=pcweb&query=음식점&type=all&searchCoord=127.3006163;127.3006163&displayCount=100&isPlaceRecommendationReplace=true
         String urlParameter = "https://map.naver.com/v5/api/search?caller=pcweb&";
         String queryParameter = "query=음식점&";
         String typeParameter = "type=all&";
@@ -179,7 +180,7 @@ public class StoreService {
                     JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"), JsonObject.class);
                     maxPage = (place.getAsJsonObject().get("totalCount").getAsInt());
                 }
-
+                Thread.sleep(1000);
                 if (response.getBody().contains("XE400")) {
                     break;
                 } else {
@@ -306,7 +307,7 @@ public class StoreService {
 //            }
             StoreLocation storeLocation = new StoreLocation();
             if(!jsonObject.getAsJsonObject().get("x").isJsonNull() && !jsonObject.getAsJsonObject().get("y").isJsonNull()){
-                storeLocation = new StoreLocation(jsonObject.getAsJsonObject().get("x").getAsString(),jsonObject.getAsJsonObject().get("y").getAsString());
+                storeLocation = new StoreLocation(jsonObject.getAsJsonObject().get("y").getAsString(),jsonObject.getAsJsonObject().get("x").getAsString());
             }else{
                 storeLocation = null;
             }

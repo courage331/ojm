@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoreLocation {
-        String storeLatitude; // x
-        String storeLongitude; // y
+        String storeLatitude; // y
+        String storeLongitude; // x
 }
