@@ -306,7 +306,7 @@ public class StoreService {
 //            }
             StoreLocation storeLocation = new StoreLocation();
             if(!jsonObject.getAsJsonObject().get("x").isJsonNull() && !jsonObject.getAsJsonObject().get("y").isJsonNull()){
-                storeLocation = new StoreLocation(jsonObject.getAsJsonObject().get("x").getAsString(),jsonObject.getAsJsonObject().get("y").getAsString());
+                storeLocation = new StoreLocation(jsonObject.getAsJsonObject().get("y").getAsString(),jsonObject.getAsJsonObject().get("x").getAsString());
             }else{
                 storeLocation = null;
             }
