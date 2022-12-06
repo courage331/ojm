@@ -173,7 +173,7 @@ public class StoreService {
                 headers.add("Accept", "application/json");
                 HttpEntity<String> entity = new HttpEntity(headers);
                 ResponseEntity<String> response = restTemplate.exchange(loopUrl + "lang=ko", HttpMethod.GET, entity, String.class);
-                //{"error":{"code":"XE400","msg":"Bad Request.","displayMsg":"잘못된 요청입니다.","extraInfo":null}}
+
                 if (maxPage == 1) {
                     JsonObject jsonObject = gson.fromJson(response.getBody(), JsonObject.class);
                     JsonObject result = gson.fromJson(jsonObject.getAsJsonObject().get("result"), JsonObject.class);
