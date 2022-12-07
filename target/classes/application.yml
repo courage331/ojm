@@ -1,0 +1,4 @@
+spring:
+  location:
+    url: "https://dapi.kakao.com/v2/local/search/address.json?analyze_type=similar&page=1&size=10&query="
+    key: "1b68ee6bb3d53873385489ee752f0699"
