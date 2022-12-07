@@ -180,7 +180,7 @@ public class StoreService {
                     JsonObject place = gson.fromJson(result.getAsJsonObject().get("place"), JsonObject.class);
                     maxPage = (place.getAsJsonObject().get("totalCount").getAsInt());
                 }
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 if (response.getBody().contains("XE400")) {
                     break;
                 } else {
